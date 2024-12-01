@@ -1,0 +1,55 @@
+---
+import { Icon } from 'astro-icon/components'
+import Navbar from '@/modules/shared/components/ui/Navbar.astro'
+
+const links = [
+  {
+    title: 'Usuarios',
+    href: '/admin/users',
+    icon: 'mdi:account-group',
+  },
+  {
+    title: 'servicios',
+    href: '/admin/services',
+    icon: 'mdi:briefcase',
+  },
+  {
+    title: 'proyectos',
+    href: '/admin/projects',
+    icon: 'mdi:webpack',
+  },
+  {
+    title: 'Nuestro Equipo',
+    href: '/admin/team',
+    icon: 'mdi:account-group',
+  },
+  {
+    title: 'Mensajes',
+    href: '/admin/contact',
+    icon: 'mdi:message-text',
+  },
+]
+
+---
+
+<Navbar links={ links }>
+  <button
+    class="flex items-center space-x-2 text-red-500 signout-button"
+  >
+    <Icon name="mdi:logout" size={ 24 } />
+    Cerrar Sesión
+  </button>
+</Navbar>
+
+<script>
+const { signOut } = await import( 'auth-astro/client' )
+
+const signoutButtons = document.querySelectorAll( '.signout-button' )
+
+signoutButtons.forEach( button => {
+  button.addEventListener( 'click', async () => {
+    await signOut()
+    location.replace( '/' )
+  } )
+} )
+</script>

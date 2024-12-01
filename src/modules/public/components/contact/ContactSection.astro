@@ -1,0 +1,156 @@
+---
+import { Icon } from 'astro-icon/components'
+import Label from '@/modules/shared/components/forms/Label.astro'
+
+
+const inputClass = 'w-full pl-10 pr-3 py-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-indigo-600 sm:text-sm text-slate-800'
+---
+
+<section id="contact" class="py-20 bg-gray-800 text-white">
+  <div class="container mx-auto px-6 lg:px-20">
+    <h2 class="text-4xl font-bold text-center mb-12">Contáctanos </h2>
+    <div class="grid lg:grid-cols-3 gap-12">
+      <!-- Formulario de contacto -->
+      <div class="lg:col-span-2">
+        <p class="mb-8 text-lg text-gray-300 text-center lg:text-left">
+          Llena los campos requeridos y haznos saber tus consultas.
+        </p>
+        <form id="contact-form" class="space-y-6">
+          <div class="grid sm:grid-cols-2 gap-6">
+            <!-- Campo Nombre -->
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-200">Nombre</label>
+              <div class="relative mt-1 rounded-md">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Icon name="mdi:account" size={24} class="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="pl-10 py-2 w-full rounded-md bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                  placeholder="Nombre"
+                />
+              </div>
+            </div>
+            <!-- Campo Correo -->
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-200">Correo Electrónico</label>
+              <div class="relative mt-1 rounded-md">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Icon name="mdi:email" size={24} class="text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="pl-10 py-2 w-full rounded-md bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+                  placeholder="ejemplo@gmail.com"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Campo Mensaje -->
+          <div>
+            <label for="message" class="block text-sm font-medium text-gray-200">Mensaje</label>
+            <textarea
+              id="message"
+              name="message"
+              rows={4}
+              class="w-full mt-1 rounded-md bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none transition pl-4 pr-4 py-2"
+              placeholder="Escribe tu mensaje aquí..."
+            ></textarea>
+          </div>
+          <!-- Botón Enviar -->
+          <button
+            type="submit"
+            class="bg-gray-600 text-white font-bold py-2 px-4 rounded hover:bg-gray-400 transition duration-300"
+          >
+            Enviar 
+          </button>
+        </form>
+      </div>
+
+      <!-- Información de contacto y mapa -->
+      <div class="space-y-8">
+        <div>
+          <h3 class="text-2xl font-semibold">Información de Contacto</h3>
+          <p class="flex items-center mt-4">
+            <Icon name="mdi:map-marker" size={24} class="mr-2 text-white" />
+            La Paz-Bolivia, Calacoto-c/12
+          </p>
+          <p class="flex items-center mt-2">
+            <Icon name="mdi:phone" size={24} class="mr-2 text-white" />
+            75815737
+          </p>
+        </div>
+        <!-- Mapa embebido -->
+        <div class="w-full rounded-lg overflow-hidden shadow-lg">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.525915609694!2d-68.12562548564047!3d-16.514995788617317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x915edf2455f2444d%3A0x5cb7be4b1f21ce8a!2sCalacoto%2C%20La%20Paz%2C%20Bolivia!5e0!3m2!1sen!2sbo!4v1698860811604!5m2!1sen!2sbo"
+            width="100%"
+            height="250"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <!-- Redes sociales -->
+        <div>
+          <h4 class="text-xl font-semibold">Síguenos</h4>
+          <div class="flex space-x-4 mt-4">
+            <a href="https://facebook.com" class="text-gray-400 hover:text-blue-500 transition">
+              <Icon name="mdi:facebook" size={24} />
+            </a>
+            <a href="https://twitter.com" class="text-gray-400 hover:text-blue-300 transition">
+              <Icon name="mdi:twitter" size={24} />
+            </a>
+            <a href="https://youtube.com" class="text-gray-400 hover:text-red-500 transition">
+              <Icon name="mdi:youtube" size={24} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+import { actions } from 'astro:actions'
+import Swal from 'sweetalert2'
+import { getErrorList } from '@/utils'
+
+const contactForm = document.getElementById( 'contact-form' ) as HTMLFormElement
+
+contactForm.addEventListener( 'submit', async () => {
+  event.preventDefault()
+
+  const formData = new FormData( contactForm )
+
+  const { error } = await actions.createContact( formData )
+
+  if ( error ) {
+    console.log({ error, errorType: typeof error })
+    const errorMessages = getErrorList( error )
+    for ( const errorMessage of errorMessages ) {
+      const { field, message } = errorMessage
+      const errorElement = document.getElementById( `${ field }-error` )
+      if ( errorElement ) {
+        errorElement.textContent = message
+        errorElement.classList.remove( 'hidden' )
+      }
+    }
+
+    return
+  }
+  Swal.fire({
+    title: 'Mensaje Enviado',
+    text: 'Gracias por contactarnos, te responderemos a la brevedad.',
+    icon: 'success',
+    confirmButtonText: 'Aceptar'
+  })
+  contactForm.reset()
+} )
+
+</script>

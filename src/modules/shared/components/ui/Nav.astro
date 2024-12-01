@@ -1,0 +1,29 @@
+---
+import { Icon } from 'astro-icon/components'
+import { type ILink } from '@/interfaces'
+
+interface Props {
+  links: ILink[]
+}
+
+const { links } = Astro.props
+---
+
+<nav
+  class="flex flex-col lg:flex-row lg:items-center capitalize"
+>
+  {
+  links.map( link => (
+  <a
+    class="text-slate-800 hover:text-slate-900 px-3 py-2 flex items-center gap-2 lg:flex-row"
+    href={ link.href }
+  >
+    <Icon
+      name={ link.icon }
+      size={ 24 }
+    />
+    { link.title }
+  </a>
+  ) )
+  }
+</nav>

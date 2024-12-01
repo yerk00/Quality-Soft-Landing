@@ -1,0 +1,178 @@
+---
+import { actions } from 'astro:actions'
+import { Icon } from 'astro-icon/components'
+import AdminLayout from '@/modules/admin/layouts/AdminLayout.astro'
+import Title from '@/modules/shared/components/ui/Title.astro'
+import CreateButton from '@/modules/shared/components/buttons/CreateButton.astro'
+import ViewButton from '@/modules/shared/components/buttons/ViewButton.astro'
+import EditButton from '@/modules/shared/components/buttons/EditButton.astro'
+
+import 'sweetalert2/dist/sweetalert2.min.css'
+import { formatDate } from '@/utils'
+
+const { data: teamMembersData, error: teamMemberError } = await actions.getAllTeamMembers()
+
+if ( teamMemberError ) return Astro.redirect( '/admin' )
+
+const { teamMembers } = teamMembersData
+
+const roleColor : Record<string, string> = {
+  'designer': 'bg-blue-100 text-blue-800',
+  'developer': 'bg-green-100 text-green-800',
+  'manager': 'bg-yellow-100 text-yellow-800',
+}
+---
+
+<AdminLayout>
+  <div class="w-full px-4 py-8 flex flex-col gap-20 items-center md:px-12">
+    <Title>👥 Administración de Miembros del Equipo</Title>
+
+    <div class="mb-4 flex justify-between items-center">
+      <CreateButton
+        href="/admin/team/create"
+        icon="mdi:plus"
+      >
+        Agregar Miembro del Equipo
+      </CreateButton>
+    </div>
+    <div class="bg-white shadow-md rounded-lg">
+      <div class="overflow-x-auto">
+        <table class="w-full divide-y divide-gray-200 max-w-4xl">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creado en</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            { teamMembers.map( ( teamMember ) => (
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{ teamMember.name }</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleColor[teamMember.role]}`}>
+                  {
+                   ( teamMember.role === 'designer' ) ? 'Diseñador' :
+                   ( teamMember.role === 'developer' ) ? 'Desarrollador' :
+                   ( teamMember.role === 'manager' ) ? 'Gerente' : ''
+                  }
+                </span>
+              </td>
+
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{  formatDate( teamMember.createdAt ) }</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${teamMember.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                  id={`span-status-${ teamMember.id }`}
+                >
+                  { teamMember.status ? 'Activo' : 'Inactivo' }
+                </span>
+              </td>
+              <td class="px-6 py-8 whitespace-nowrap text-sm font-medium flex items-center">
+                <ViewButton href={`/admin/team/${ teamMember.id }`} />
+                <EditButton href={`/admin/team/edit/${ teamMember.id }`} />
+                <button
+                  class="toggle-button"
+                  data-id={ teamMember.id }
+                  data-current-status={ teamMember.status }
+                >
+                  <Icon
+                    name="mdi:delete"
+                    size={ 20 }
+                    class={ `text-red-600 hover:text-red-900 ${ ( !teamMember.status ) ? 'hidden' : '' } delete-icon` }
+                  />
+                  <Icon
+                    name="mdi:restore"
+                    size={ 20 }
+                    class={ `text-green-600 hover:text-green-900 ${ teamMember.status ? 'hidden' : '' } restore-icon` }
+                  />
+                </button>
+              </td>
+            </tr>
+            ) ) }
+            {
+              teamMembers.length === 0 && (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap" colspan="10">
+                  <div class="text-sm text-gray-500 text-center">No hay datos registrados</div>
+                </td>
+              </tr>
+            ) }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+<script>
+import { actions } from 'astro:actions'
+import Swal from 'sweetalert2'
+
+const deleteButtons = document.querySelectorAll( '.toggle-button' )
+
+deleteButtons.forEach( ( button ) => {
+  button.addEventListener( 'click', async ( _e ) => {
+    const id = button.getAttribute( 'data-id' )
+
+    const currentStatus = button.getAttribute( 'data-current-status' ) === 'true'
+
+    if ( !id ) return
+
+    const { error } = await actions.toggleStatusTeamMember( { id, currentStatus } )
+
+    if ( error ) {
+      Swal.fire( {
+        icon: 'error',
+        title: 'Error al eliminar el usuario',
+        text: 'No se pudo eliminar el usuario. Por favor, inténtelo de nuevo.',
+      } )
+      return
+    }
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Perfecto!',
+      text: `Se realizo la accion`,
+    })
+
+    button.setAttribute('data-current-status', (!currentStatus).toString())
+
+    const statusSpan = document.querySelector( `#span-status-${ id }` ) as HTMLElement
+
+    if ( !currentStatus ) {
+      statusSpan.classList.add( 'bg-green-100' )
+      statusSpan.classList.add( 'text-green-800' )
+      statusSpan.classList.remove( 'bg-red-100' )
+      statusSpan.classList.remove( 'text-red-800' )
+      statusSpan.textContent = 'Activo'
+    } else {
+      statusSpan.classList.add( 'bg-red-100' )
+      statusSpan.classList.add( 'text-red-800' )
+      statusSpan.classList.remove( 'bg-green-100' )
+      statusSpan.classList.remove( 'text-green-800' )
+      statusSpan.textContent = 'Inactivo'
+    }
+
+    const deleteIcon = button.querySelector( '.delete-icon' ) as HTMLElement
+    const restoreIcon = button.querySelector( '.restore-icon' ) as HTMLElement
+
+    if ( !currentStatus ) {
+      deleteIcon.classList.remove('hidden')
+      restoreIcon.classList.add('hidden')
+    } else {
+      deleteIcon.classList.add('hidden')
+      restoreIcon.classList.remove('hidden')
+    }
+  } )
+} )
+</script>

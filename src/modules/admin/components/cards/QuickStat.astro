@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  icon: string
+  title: string
+  value: string
+  href: string
+}
+
+const { icon, title, value, href } = Astro.props
+---
+
+<div class="bg-white overflow-hidden shadow rounded-lg w-full">
+  <div class="p-5">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <Icon
+          name={ icon }
+          size={ 32 }
+          class="text-blue-600"
+        />
+      </div>
+      <div class="ml-5 w-0 flex-1">
+        <dl>
+          <dt class="text-sm font-medium text-gray-500 truncate">{title}</dt>
+          <dd>
+            <div class="text-lg font-medium text-gray-900">{value}</div>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="bg-gray-50 px-5 py-3">
+    <div class="text-sm">
+      <a
+        href={ href }
+        class="font-medium text-blue-700 hover:text-blue-900"
+      >
+        Ver todos
+      </a>
+    </div>
+  </div>
+</div>
+
+

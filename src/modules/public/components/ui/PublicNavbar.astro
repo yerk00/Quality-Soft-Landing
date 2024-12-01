@@ -1,0 +1,45 @@
+---
+import Navbar from '@/modules/shared/components/ui/Navbar.astro'
+
+const links = [
+  {
+    title: '¿Quiénes somos?',
+    href: '/#about', // Ruta completa a la sección de "Quiénes somos"
+    icon: 'mdi:information',
+  },
+  {
+    title: 'Servicio',
+    href: '/#services', // Ruta completa a la sección de servicios
+    icon: 'mdi:briefcase',
+  },
+  {
+    title: 'Proyectos',
+    href: '/#projects', // Ruta completa a la sección de proyectos
+    icon: 'mdi:webpack',
+  },
+  {
+    title: 'Tecnologías',
+    href: '/#technologies', // Ruta completa a la sección de tecnologías
+    icon: 'mdi:react',
+  },
+  {
+    title: 'Nuestro Equipo',
+    href: '/#team', // Ruta completa a la sección de equipo
+    icon: 'mdi:account-group',
+  },
+  {
+    title: 'Contacto',
+    href: '/#contact', // Ruta completa a la sección de contacto
+    icon: 'mdi:email',
+  },
+  {
+    title: 'Ingresar',
+    href: '/auth/signin',
+    icon: 'mdi:login',
+  },
+];
+
+
+---
+
+<Navbar links={ links } />

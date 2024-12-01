@@ -1,0 +1,79 @@
+---
+import { actions } from 'astro:actions'
+import AdminLayout from '@/modules/admin/layouts/AdminLayout.astro'
+import Title from '@/modules/shared/components/ui/Title.astro'
+import ViewButton from '@/modules/shared/components/buttons/ViewButton.astro'
+import { formatDate } from '@/utils'
+
+import 'sweetalert2/dist/sweetalert2.min.css'
+
+const { data: contactsData, error: contactError } = await actions.getAllContacts()
+
+if ( contactError ) return Astro.redirect( '/admin' )
+
+const { contacts } = contactsData
+---
+
+<AdminLayout>
+  <div class="w-full px-4 py-8 flex flex-col gap-20 items-center md:px-12">
+    <Title>👥 Mensajes de Contacto</Title>
+
+    <div class="bg-white shadow-md rounded-lg">
+      <div class="overflow-x-auto">
+        <table class="w-full divide-y divide-gray-200 max-w-4xl">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Registro</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            { contacts.map( ( contact ) => (
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{ contact.name }</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{ contact.email } </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                  contact.state === 'new' ? 'bg-blue-100 text-blue-800' :
+                  contact.state === 'read' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                  }`}>
+                  {
+                  contact.state === 'new' ? 'Nuevo' :
+                    contact.state === 'read' ? 'Leído' : 'Respondido' }
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">{ formatDate( contact.createdAt ) }</div>
+              </td>
+
+              <td class="px-6 py-8 whitespace-nowrap flex items-center justify-center">
+                <ViewButton href={`/admin/contact/${ contact.id }`} />
+              </td>
+            </tr>
+            ) ) }
+            {
+              contacts.length === 0 && (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap" colspan="10">
+                  <div class="text-sm text-gray-500 text-center">No hay datos registrados</div>
+                </td>
+              </tr>
+            ) }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

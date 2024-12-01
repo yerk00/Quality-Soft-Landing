@@ -1,0 +1,43 @@
+---
+import AdminNavbar from '@/modules/admin/components/ui/AdminNavbar.astro'
+import Title from '@/modules/shared/components/ui/Title.astro'
+import Layout from '@/modules/shared/layouts/Layout.astro'
+import QuickStat from '@/modules/admin/components/cards/QuickStat.astro'
+
+---
+
+<Layout>
+  <AdminNavbar />
+  <div class="px-4 py-6 sm:px-0 flex flex-col w-full justify-center items-center">
+    <Title>Dashboard 📊</Title>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 w-full place-items-center p-8 mt-8 max-w-7xl">
+      <QuickStat
+        icon="mdi:account-group"
+        title="Usuarios"
+        value="152"
+        href="/admin/users"
+      />
+      <QuickStat
+        icon="mdi:briefcase-outline"
+        title="Servicios"
+        value="24"
+        href="/admin/services"
+      />
+
+      <QuickStat
+        icon="mdi:cog"
+        title="Proyectos"
+        value="18"
+        href="/admin/projects"
+      />
+
+      <QuickStat
+        icon="mdi:message-text-outline"
+        title="Mensajes"
+        value="64"
+        href="/admin/contact"
+      />
+    </div>
+  </div>
+</Layout>

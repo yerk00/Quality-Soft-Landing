@@ -1,0 +1,77 @@
+---
+import { Icon } from 'astro-icon/components'
+import Nav from './Nav.astro'
+
+import type { ILink } from '@/interfaces'
+
+interface Props {
+  links: ILink[]
+}
+
+const { links } = Astro.props
+---
+<header class="flex flex-col w-full items-center justify-center px-6 py-4 bg-gray-50 shadow-md">
+  <div class="w-full flex items-center justify-between">
+    <a
+      href="/"
+      class="flex items-center gap-2 transition-transform hover:scale-110 duration-300"
+    >
+      <img
+        src="https://qualitysoft-1f745.web.app/img/qua.png"
+        class="w-[200px]" 
+        alt="QualitySoft Logo"
+      />
+    </a>
+
+    <div
+      class="hidden w-full lg:flex lg:items-center lg:justify-end"
+      id="desktop-navbar"
+    >
+      <Nav links={links} />
+      <slot />
+    </div>
+
+    <button
+      class="flex items-center justify-center px-3 py-2 border-2 border-gray-300 rounded-lg text-slate-800 lg:hidden transition-colors hover:bg-gray-200 duration-300"
+      id="toggle-menu-button"
+    >
+      <Icon
+        id="menu-icon"
+        name="mdi:menu"
+        size={24}
+        class="transition-transform hover:rotate-90 duration-300"
+      />
+      <Icon
+        id="close-icon"
+        name="mdi:close"
+        size={24}
+        class="hidden transition-transform hover:rotate-90 duration-300"
+      />
+    </button>
+  </div>
+
+  <div
+    class="hidden w-full flex-col lg:hidden"
+    id="mobile-navbar"
+  >
+    <Nav links={links} />
+    <div class="p-4 border-t-2 border-gray-300">
+      <slot />
+    </div>
+  </div>
+</header>
+
+<script>
+const menuIcon = document.getElementById('menu-icon') as HTMLElement
+const closeIcon = document.getElementById('close-icon') as HTMLElement
+const toggleMenuButton = document.getElementById('toggle-menu-button') as HTMLButtonElement
+
+toggleMenuButton.addEventListener('click', () => {
+  const mobileNavbar = document.getElementById('mobile-navbar') as HTMLElement
+
+  mobileNavbar.classList.toggle('hidden')
+
+  menuIcon.classList.toggle('hidden')
+  closeIcon.classList.toggle('hidden')
+})
+</script>

@@ -1,0 +1,119 @@
+---
+import { actions } from 'astro:actions'
+import { Icon } from 'astro-icon/components'
+import AdminLayout from '@/modules/admin/layouts/AdminLayout.astro'
+import { formatDate } from '@/utils'
+import 'sweetalert2/dist/sweetalert2.min.css'
+
+const id = Astro.params.id
+const { data: teamMemberData, error: teamMemberError } = await actions.getOneTeamMember({ id })
+console.log({ id, teamMemberData, teamMemberError })
+
+if ( teamMemberError ) return Astro.redirect( '/404' )
+
+const { teamMember } = teamMemberData
+const {
+  name,
+  imageUrl,
+  role,
+  bio,
+  createdAt,
+  updatedAt,
+  status,
+} = teamMember
+
+
+const roleColor : Record<string, string> = {
+  'designer': 'bg-blue-100 text-blue-800',
+  'developer': 'bg-green-100 text-green-800',
+  'manager': 'bg-yellow-100 text-yellow-800',
+}
+
+---
+
+<AdminLayout>
+  <div class="bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-700 to-slate-900 p-6 sm:p-10">
+          <div class="flex flex-col sm:flex-row items-center">
+            <div class="mb-4 sm:mb-0 sm:mr-6">
+              <img
+                src={ imageUrl }
+                alt={ 'avatar' }
+                class="w-32 h-32 rounded-full object-cover"
+              />
+            </div>
+            <div class="text-center sm:text-left">
+              <h1 class="text-3xl font-bold text-white mb-2 capitalize"> { name } </h1>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 sm:p-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div class="flex items-center">
+              <Icon name="mdi:email-outline" size={ 24 } class="mr-3 text-slate-700" />
+              <div>
+                <p class="text-gray-600"> Rol </p>
+                <p class="font-medium">
+                  <span class={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${ roleColor[ role ] }`}>
+                    {
+                    ( role === 'designer' ) ? 'Diseñador' :
+                      ( role === 'developer' ) ? 'Desarrollador' :
+                        ( role === 'manager' ) ? 'Gerente' : ''
+                    }
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <Icon name="mdi:account-details" size={ 24 } class="mr-3 text-slate-700" />
+              <div>
+                <p class="text-gray-600">Biografía</p>
+                <p class="font-medium">{ bio }</p>
+              </div>
+            </div>
+
+            <div class="flex items-center">
+              <Icon name="mdi:calendar" size={ 24 } class="mr-3 text-slate-700" />
+              <div>
+                <p class="text-gray-600">Fecha de registro</p>
+                <p class="font-medium">{ formatDate( createdAt ) }</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <Icon name="mdi:calendar" size={ 24 } class="mr-3 text-slate-700" />
+              <div>
+                <p class="text-gray-600">Fecha de última actualización</p>
+                <p class="font-medium">{ formatDate( updatedAt ) }</p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-10 flex flex-col sm:flex-row justify-between items-center">
+            <div class="mb-4 sm:mb-0">
+              <span class="font-medium text-gray-500 mr-2">Estado:</span>
+              <span class={`px-3 py-1 rounded-full font-medium ${
+                status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                { status ? '✅ Activo' : '❌ Inactivo' }
+              </span>
+            </div>
+            <div class="flex space-x-4 mt-6 md:mt-0">
+              <a
+                class="flex items-center px-4 py-2 border border-gray-300 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-700 transition-colors duration-200"
+                href={ `/admin/team/edit/${ id }` }
+              >
+                <Icon name="mdi:pencil" size={ 24 } class="mr-2" />
+                Editar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>

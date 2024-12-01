@@ -1,0 +1,214 @@
+---
+import Layout from '@/modules/shared/layouts/Layout.astro'
+import PublicNavbar from '@/modules/public/components/ui/PublicNavbar.astro'
+import ContactSection from '@/modules/public/components/contact/ContactSection.astro'
+import { Icon } from 'astro-icon/components'
+import { actions } from 'astro:actions'
+
+const { data: servicesData, error: servicesError } = await actions.getAllServices()
+if ( servicesError ) return Astro.redirect( '/' )
+const { services } = servicesData
+
+const { data: projectsData, error: projectsError } = await actions.getAllProjects()
+if ( projectsError ) return Astro.redirect( '/' )
+const { projects } = projectsData
+
+const { data: teamMembarsData, error: teamMembersError } = await actions.getAllTeamMembers()
+if ( teamMembersError ) return Astro.redirect( '/' )
+const { teamMembers } = teamMembarsData
+---
+
+<Layout>
+  <div class="w-full">
+    <section class="w-full bg-black" id="home">
+      <div
+        class="w-full min-h-[800px] flex flex-col items-center justify-end text-white"
+        style={{
+          backgroundImage: "url('https://qualitysoft-1f745.web.app/img/developer.gif')",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div class="bg-black bg-opacity-50 p-8 mb-20 flex flex-col items-center justify-center max-w-3xl text-center gap-12">
+          <h1 class="text-4xl md:text-8xl font-extrabold uppercase">QualitySoft</h1>
+          <p class="text-xl md:text-2xl text-center">
+            Soluciones innovadoras y personalizadas en desarrollo de
+            software. Impulsa la eficiencia y el crecimiento de tu
+            negocio con nuestras soluciones tecnológicas a medida
+          </p>
+        </div>
+      </div>
+    </section>
+    <section id="about" class="py-20">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-wrap items-center">
+          <div class="w-full md:w-1/2 mb-10 md:mb-0">
+            <img
+              src="https://qualitysoft-1f745.web.app/img/qua.png"
+              alt="QualitySoft"
+              class="rounded-lg shadow-xl"
+            />
+          </div>
+          <div class="w-full md:w-1/2 md:pl-10">
+            <h2 class="text-4xl font-bold mb-6">¿Quiénes Somos? </h2>
+            <p class="mb-6 text-pretty">
+              QualitySoft, fundada en 2024, ofrece soluciones innovadoras en desarrollo de software, incluyendo aplicaciones web, móviles y sistemas empresariales. Nuestro nuevo proyecto "Manos a la Obra: Plataforma de Servicios Inmediatos" refleja nuestro compromiso con la innovación.
+            </p>
+            <h3 class="text-2xl font-semibold mb-4">Misión y Visión </h3>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div class="flex flex-col gap-4">
+                <p class="text-xl font-medium">Misión:</p>
+                <p class="text-pretty">Brindar soluciones de software de alta calidad que impulsen la eficiencia y el crecimiento de los negocios.</p>
+              </div>
+              <div class="flex flex-col gap-4">
+                <p class="text-xl font-medium">Visión:</p>
+                <p class="text-pretty">Ser líderes en desarrollo de software, reconocidos por entregar soluciones innovadoras que superen las expectativas del cliente.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="services" class="py-20 bg-white">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Nuestros servicios </h2>
+        <p class="text-center mb-12 max-w-2xl mx-auto text-lg">
+          QualitySoft ofrece soluciones innovadoras en desarrollo de software, enfocándose en aplicaciones web, móviles y sistemas empresariales.
+        </p>
+        <div class="grid md:grid-cols-3 gap-8">
+          {
+            services.filter( s => s.status ).map( ( service ) => (
+            <div class="bg-gray-50 rounded-lg shadow-lg overflow-hidden">
+              <img src={ service.imageUrl } alt={ service.title } class="w-full h-48 object-cover" />
+              <div class="p-6">
+              <h3 class="text-2xl font-semibold mb-2 flex flex-col items-center gap-2">
+                <Icon name={ service.icon } size={ 30 } class="text-gray-600" />
+                { service.title }</h3>
+                <p class="mb-4">{ service.description }</p>
+                <a href={ `/services/${ service.id }` } class="bg-gray-800 text-white font-bold py-2 px-4 rounded hover:bg-gray-400 transition duration-300">
+                  Ver Más
+                </a>
+              </div>
+            </div>
+            ) )
+          }
+        </div>
+      </div>
+    </section>
+    <section id="projects" class="py-20">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Proyectos</h2>
+        <p class="mb-12 max-w-2xl mx-auto font-semibold text-pretty">
+          🌐 Explora nuestras soluciones avanzadas en desarrollo de software, diseñadas para transformar tu negocio. Ofrecemos desde aplicaciones web modernas y personalizadas hasta sistemas empresariales robustos 🛠️ que optimizan la gestión y aumentan la eficiencia 📈.
+        </p>
+        <div class="grid md:grid-cols-3 gap-8">
+          {
+          projects.filter( p => p.status ).map( ( project ) => (
+          <a
+            class="group relative overflow-hidden rounded-lg shadow-lg"
+            href={ `/projects/${ project.id }` }
+          >
+            <img src={ project.imageUrl } alt={ project.title } class="w-full h-64 object-cover transition duration-300 group-hover:scale-110" />
+            <div class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 flex-col">
+              <h3 class="text-white text-xl font-semibold text-center px-4">
+                { project.title }
+              </h3>
+              <p class="text-white text-center px-4"> Haga clic para obtener más información </p>
+            </div>
+          </a>
+          ) )
+          }
+        </div>
+      </div>
+    </section>
+    <section id="technologies" class="py-20 bg-gray-800 text-white">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Tecnologías Utilizadas </h2>
+        <p class="text-center mb-12 max-w-2xl mx-auto">
+          En QualitySoft, utilizamos tecnologías como JavaScript, Python, React y Angular para desarrollar soluciones de software innovadoras.
+        </p>
+        <div class="relative w-full h-32">
+          <!-- Contenedor del carrusel -->
+          <div
+            id="carousel"
+            class="flex w-full h-full transition-transform duration-500 ease-in-out"
+            style="transform: translateX(0);"
+          >
+            {[
+              'https://img.icons8.com/?size=100&id=12584&format=png&color=FFFFFF',
+              'https://img.icons8.com/?size=100&id=997y4SZQkDuP&format=png&color=FFFFFF',
+              'https://img.icons8.com/?size=100&id=PnrV6tAbzYGd&format=png&color=FFFFFF',
+              'https://img.icons8.com/?size=100&id=39854&format=png&color=FFFFFF',
+              'https://img.icons8.com/?size=100&id=36440&format=png&color=FFFFFF',
+              'https://img.icons8.com/?size=100&id=39855&format=png&color=FFFFFF',
+              'https://i.postimg.cc/DZbdM9J6/pngaaa-com-8796792.png'
+            ].map((tech) => (
+              <div
+                class="flex justify-center items-center min-w-full h-full"
+              >
+                <img
+                  src={tech}
+                  alt="Tech icon"
+                  class="w-40 h-60 object-contain p-4 rounded-full "
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        
+      </div>
+    </section>
+    <section id="team" class="py-20">
+      <div class="container mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12">Equipo QualitySoft </h2>
+        <p class="text-center mb-12 max-w-2xl mx-auto">Conozca a los profesionales detrás de nuestras innovaciones.</p>
+        <div class="flex justify-center">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl">
+            {
+            teamMembers.filter( t => t.status ).map( ( member ) => (
+            <div 
+              class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 hover:shadow-xl">
+              <img
+                src={ member.imageUrl ? member.imageUrl :  `https://qualitysoft-1f745.web.app/img/ing.png` }
+                alt={member.name} 
+                class="w-full h-64 object-cover hover:opacity-90 transition-opacity"
+              />
+              <div class="p-6 text-center">
+                <h3 class="text-xl font-semibold mb-2">{member.name}</h3>
+                <p class="text-gray-600">
+                  {
+                  ( member.role === 'developer' ) ? 'Desarrollador' :
+                  ( member.role === 'designer' ) ? 'Diseñador' :
+                  ( member.role === 'manager' ) ? 'Gerente' : 'Consultor'
+                  }
+                </p>
+                <p class="text-gray-600 text-pretty">{ member.bio }</p>
+              </div>
+            </div>
+            ))
+            }
+          </div>
+        </div>
+        
+      </div>
+    </section>
+    <ContactSection />
+  </div>
+</Layout>
+<script>
+  // Configuración del carrusel
+  const carousel = document.getElementById('carousel');
+  const items = Array.from(carousel.children); // Los elementos del carrusel
+  let currentIndex = 0;
+
+  // Función para mover el carrusel
+  const moveToNextSlide = () => {
+    currentIndex = (currentIndex + 1) % items.length; // Incrementa el índice cíclicamente
+    carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+  };
+
+  // Configurar el intervalo de cambio automático
+  setInterval(moveToNextSlide, 2000); // Cambia cada 3 segundos
+</script>

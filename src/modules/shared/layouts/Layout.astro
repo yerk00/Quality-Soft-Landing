@@ -1,0 +1,48 @@
+---
+
+import Footer from '@/modules/shared/components/ui/Footer.astro';
+import PublicNavbar from '@/modules/public/components/ui/PublicNavbar.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  author?: string;
+  class?: string;
+}
+
+const {
+  title = 'Mi Sitio Web',
+  description = 'Descripción predeterminada',
+  image = '/default-image.jpg',
+  author = 'Autor predeterminado',
+} = Astro.props;
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="author" content={author} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="w-full min-h-screen flex flex-col">
+      <!-- Navbar -->
+      <PublicNavbar/>
+
+      <!-- Main content -->
+      <div class="flex-grow">
+        <slot />
+      </div>
+
+      <!-- Footer -->
+      <Footer />
+    </main>
+  </body>
+</html>

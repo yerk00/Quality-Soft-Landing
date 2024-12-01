@@ -1,0 +1,207 @@
+---
+import { actions } from 'astro:actions'
+import { Icon } from 'astro-icon/components'
+import Label from '@/modules/shared/components/forms/Label.astro'
+
+const { data: servicesData, error: servicesError } = await actions.getAllServices()
+if ( servicesError ) return Astro.redirect( '/admin/services' )
+
+const { services } = servicesData
+
+interface Props {
+  data: {
+    id: string
+    title: string
+    description: string
+    imageUrl: string | null
+    client: string
+    startDate: Date
+    endDate: Date
+    category: string
+    serviceId: string
+    link: string | null
+  }
+}
+
+const { data } = Astro.props
+
+const inputClass = 'w-full pl-10 pr-3 py-3 border-2 border-gray-300 rounded-md focus:outline-none focus:border-indigo-600 sm:text-sm'
+
+const inputs = [
+  {
+    label: 'Título',
+    name: 'title',
+    type: 'text',
+    value: data.title,
+    icon: 'mdi:format-title',
+    placeholder: 'Ingrese el título del servicio',
+    isRequired: true,
+  },
+  {
+    label: 'Descripción',
+    id: 'description',
+    name: 'description',
+    type: 'text',
+    value: data.description,
+    icon: 'mdi:format-text',
+    placeholder: 'Ingrese la descripción del servicio',
+    isRequired: true,
+  },
+  {
+    label: 'Imagen(Link)',
+    name: 'imageUrl',
+    type: 'text',
+    value: data.imageUrl,
+    icon: 'mdi:image',
+    placeholder: 'https://example.com/avatar.jpg',
+    isRequired: false,
+  },
+  {
+    label: 'Enlace al Proyecto',
+    name: 'link',
+    type: 'text',
+    icon: 'mdi:link',
+    value: data.link,
+    placeholder: 'https://example.com',
+    isRequired: false,
+  },
+  {
+    label: 'Cliente',
+    name: 'client',
+    type: 'text',
+    value: data.client,
+    icon: 'mdi:account',
+    placeholder: 'Ingrese el cliente del servicio',
+  },
+  {
+    label: 'Fecha de Inicio',
+    name: 'startDate',
+    type: 'date',
+    value: new Date( data.startDate ).toISOString().split( 'T' )[0],
+    icon: 'mdi:calendar',
+    placeholder: 'Ingrese la fecha de inicio del servicio',
+  },
+  {
+    label: 'Fecha de Finalización',
+    name: 'endDate',
+    type: 'date',
+    value: new Date( data.endDate ).toISOString().split( 'T' )[0],
+    icon: 'mdi:calendar',
+    placeholder: 'Ingrese la fecha de finalización del servicio',
+  },
+  {
+    label: 'Categoría',
+    name: 'category',
+    type: 'text',
+    value: data.category,
+    icon: 'mdi:format-list-checks',
+    placeholder: 'Ingrese la categoría del servicio',
+  },
+]
+
+---
+
+<form
+  id="update-project-form"
+  class="px-4 py-5 sm:p-6"
+>
+  <input type="hidden" name="id" value={ data.id } />
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    {
+    inputs.map( ( input ) => (
+    <div>
+      <Label
+        for={ input.name }
+        isRequired={ input.isRequired }
+      > { input.label } </Label>
+      <div class="mt-1 relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon name={ input.icon } size={ 24 } class="text-gray-400" />
+        </div>
+        <input
+          id={ input.name }
+          type={ input.type as any }
+          name={ input.name }
+          value={ ( input.value ) ? input.value : '' }
+          class={ inputClass }
+          placeholder={ input.placeholder }
+        />
+      </div>
+      <p class="mt-2 text-sm text-red-600 hidden error" id={ `${ input.name }-error` }></p>
+    </div>
+    ) )
+    }
+    <div>
+      <Label
+        for={ `serviceId` }
+        isRequired={ true }
+      > { `Seleccione el servicio` } </Label>
+      <div class="mt-1 relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon name={ 'mdi:format-list-checks' } size={ 24 } class="text-gray-400" />
+        </div>
+        <select
+          id={ `serviceId` }
+          name={ `serviceId` }
+          class={ inputClass }
+        >
+          {
+          services.map( ( service ) => (
+          <option
+            value={ service.id }
+            selected={ service.id === data.serviceId }
+          >{ service.title }</option>
+          ) )
+          }
+        </select>
+      </div>
+      <p class="mt-2 text-sm text-red-600 hidden error" id={ `${ `serviceId` }-error` }></p>
+    </div>
+  </div>
+  <div class="mt-8">
+    <p class="mt-2 text-sm text-red-600 hidden" id="default-error"></p>
+  </div>
+
+  <div class="mt-8">
+    <button
+      class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-800 hover:bg-slate-950' focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-800 transition-colors duration-200"
+    >
+      <Icon name="mdi:content-save" size={ 24 } class="mr-2" />
+      Editar Proyecto
+    </button>
+  </div>
+</form>
+
+<script>
+import { actions } from 'astro:actions'
+import { navigate } from 'astro:transitions/client'
+import { getErrorList } from '@/utils'
+
+const form = document.getElementById( 'update-project-form' ) as HTMLFormElement
+
+form.addEventListener( 'submit', async ( event ) => {
+  event.preventDefault()
+  console.log( 'submit' )
+
+  const formData = new FormData( form )
+
+  const { error } = await actions.updateProject( formData )
+
+  if ( error ) {
+    console.log({ error, errorType: typeof error })
+    const errorMessages = getErrorList( error )
+    for ( const errorMessage of errorMessages ) {
+      const { field, message } = errorMessage
+      const errorElement = document.getElementById( `${ field }-error` )
+      if ( errorElement ) {
+        errorElement.textContent = message
+        errorElement.classList.remove( 'hidden' )
+      }
+    }
+    return
+  }
+
+  navigate( '/admin/projects' )
+} )
+</script>
+
